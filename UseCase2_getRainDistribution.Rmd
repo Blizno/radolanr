@@ -1,0 +1,117 @@
+---
+title: use case 2 - get rain distribution along the Elbe River
+output:
+  github_document:
+    number_sections: true
+---
+
+<!-- README.md is generated from README.Rmd. Please edit that file -->
+
+```{r setup, echo = FALSE}
+# set general behaviour of the chunks here.. you may still modify it later in the chunks
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.path = "man/figures/README-",
+  echo = TRUE, 
+  results = "hide", # hide outputs of a the code (warnings ect. will still be printed; comand to unable in individual chunks: results="markup")
+  error=FALSE, # results = 'hide' option doesn't prevent other messages to be printed. To hide them like this, they will still be printed to console
+  warning=FALSE,  # results = 'hide' option doesn't prevent other messages to be printed. To hide them like this, they will still be printed to console
+  message=FALSE  # results = 'hide' option doesn't prevent other messages to be printed. To hide them like this, they will still be printed to console
+)
+```
+
+# Introduction
+
+# Install packages
+```{r}
+#library(rdwd)
+#rdwd::updateRdwd() # --> installes the last version, developement version on the github is used..
+library(rdwd)
+
+#install.packages('dwdradar')
+library(dwdradar)
+library(radolanr)
+
+library(ggplot2)
+
+library(tidyverse) 
+
+library(reshape2)
+```
+
+# load vector file to extract data
+```{r}
+# read shapefiles of target areas
+my.centroids <- terra::vect("data_raw/transsect_weinbau_seusslitz_pillnitz_4326.shp")
+```
+
+
+## Test: Daily Radar Files
+- refer to example in Berries Book: https://bookdown.org/brry/rdwd/use-case-daily-radar-files.html
+
+rdwd::updateRdwd() Download and read with readDWD.radar with dividebyten=TRUE:
+
+- rdwd greift auf ftp server zu --> umgucken dort mit winscp: opendata.dwd.de --> anonym zugreifen
+- ich greife mit meinem bisherigen skript auf https zu --> das ist aber in dataDWD auch implementiert, also kann ich auch weiterhin auf die "latest" daten zugreifen
+- so wie es scheint gibt es eine Abweichung um eine 10er Stelle. meine bisherigen Abfragen liefern höhere Werte um ziemlich genau *10 höher --> ich habe das Raster exportiert und die Werte verglichen am 8.1.2024 9:22 nach Niederschlägen über nacht die bei ca. 2mm lagen?? 0.2 mm scheint mir zu wenig. 
+- auf opendata.dwd.de gibt es eine Erklärung im pdf Format zu den Daten
+- 
+ftp://opendata.dwd.de/climate_environment/CDC/grids_germany/daily/ --> hier gibt es auch evapotranspiratioen!!
+
+
+
+## DATENBESCHREIBUNG
+- Räumliche Abdeckung: Deutschland
+- Zeitliche Abdeckung: 2020-01-01 bis - heute
+- Räumliche Auflösung: 1km x 1km
+- Zeitliche Auflösung: 24 Stunden (rollend)
+- Projektion: Polar Steoreographische Projektion, Zentral Meridian 10.0° O , Standard Parallele 60.0° N
+- Format(e): Die Daten liegen als komprimierte Dateien im originären Binär-Format vor, Details siehe RADOLAN/RADVOR-Kompositformatbeschreibung.
+- Parameter: **Niederschlagshöhe in 1/10 mm**
+- Unsicherheiten: Eine erste Validierung der Daten zeigt, dass der mittlere absolute Fehler gegenüber den von Stationengemessenen Werten bei ca. 1,05 mm/Tag liegt. Details s. Beitrag zur Europäischen Radarkonferenz 2010 inSibiu.
+
+Kommentar: Ich verstehe die Angabe, dass die Niederschlagshöhen in 1/10mm angegeben sind so, dass die tatsächliche Niederschlagshöhe durch 10 geteilt wurde und für die richtigen Niederschlagsmengen, *10 gerechnet werden müssen! --> wenn sich das bestätigt wäre ein Hinweis für den Ersteller des Packages sehr hilfreich.. 
+
+Eine Andere Erklärung ist, dass die werte in "Zehntel-Milimetern" angegeben werden, dass also ein Wert von 1 einem Niederschag von 0.1mm entspricht. Und ein Wert von 10 einem Niederschlag von 1 mm. 
+
+Todo: vergleiche Niederschläge einer Wetterstation in der Nähe mit den Niederschlägen die von Radolan rausgegeben werden. Am Besten Niederschlagsdaten einer Station und Radolandaten an dieser Station vergleichen!
+
+Datasets are available at hour:50 every hour. So the dataset at 23:50 is the last dataset at a specific day
+```{r}
+radp <- radolanr::dataDWDPerDay(mode = "latest")
+```
+
+
+Project and then plot:
+- there seem to be a problem with the decimal places. One would understand 1/10mm, that a value of 1 means 0.1 mm but if I compare the rain amounts with measured values by weather stations, I would suggest, that a value of 1 is equal to 10mm of rain amount. 
+```{r}
+plotRadar(radp, main=paste("mm in 24 hours preceding"), project=FALSE)
+```
+
+
+# extract values from raster file
+extract values at specific point with raster.. 
+
+!! bisher stimmen diese Werte nicht mit denen überein die ich in der App ausgebe --> also mit denen die von https:---recent erstellt werden. Die Daten auf dem opendata.dwd scheinen 1h aktueller als die Daten auf dem cdc-ftpserver
+```{r}
+# Extract raster values to list object
+r.vals <- terra::extract(radp, my.centroids, na.rm = TRUE)  # !! changed raster extract to terra:extract to be consistent here --> maybe change this in UseCase1 too
+r.vals  
+
+# Extract function returns a data frame with an ID column, so merge properly
+my.centroids$rain_24h <- r.vals[, 2]  # Second column contains raster values
+```
+
+```{r}
+# library(terra)
+# 
+# terra::plot(radp)  # Plot raster
+# #plot.new()
+# col_points <- terrain.colors(length(unique(my.centroids$rain_24h)))[as.factor(my.centroids$rain_24h)]
+# terra::plot(my.centroids, col=col_points, pch=16, cex=2, add=TRUE)  # Color by values
+# legend("topright", legend=unique(p$extracted_values), col=unique(col_points), pch=16)
+
+```
+
+
