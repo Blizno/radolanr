@@ -39,7 +39,7 @@ dataDWDPerDay <- function(mode = "specific", date = Sys.Date()-1, hour = "23", a
     # aber bei https:// hat der Datensatz 20:50 hat den Stand 21:16
     # im FTP hat der Datensatz 20:50 Aenderungsdatum 23:20 obwohl es gerade erst 22:53 ist.. vielleicht haben die FTP-Daten ein anderes Datumsformat, was ich nicht glaube, sondern nur der Server hat ein komisches Zeit-Format: Winterzeit?!
 
-    mytime <- Sys.time()
+    mytime  <- Sys.time()
     time_lt <- as.POSIXlt(mytime)
 
     # test if minutes are > or < 20 Mintes (add some buffer and use 25)

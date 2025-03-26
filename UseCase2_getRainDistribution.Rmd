@@ -27,27 +27,17 @@ knitr::opts_chunk$set(
 ```{r}
 #library(rdwd)
 #rdwd::updateRdwd() # --> installes the last version, developement version on the github is used..
-library(rdwd)
 
-#install.packages('dwdradar')
-library(dwdradar)
+# library(rdwd)
+# #install.packages('dwdradar')
+# library(dwdradar)
 library(radolanr)
 
 library(ggplot2)
-
 library(tidyverse) 
-
 library(reshape2)
-
 library(terra) # for the raster and vector data treatment
 ```
-
-# load vector file to extract data
-```{r}
-# read shapefiles of target areas
-#my.centroids <- terra::vect("data_raw/transsect_weinbau_seusslitz_pillnitz_4326.shp")
-```
-
 
 ## DATENBESCHREIBUNG
 --> refer to UseCase1
@@ -85,7 +75,7 @@ metags(radp)
 
 Plot Radolan data
 ```{r}
-plotRadar(radp, main=paste("mm in 24 hours preceding"), project=FALSE)
+#plotRadar(radp, main=paste("mm in 24 hours preceding"), project=FALSE)
 ```
 
 

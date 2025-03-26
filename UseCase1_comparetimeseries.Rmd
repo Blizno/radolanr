@@ -25,12 +25,12 @@ knitr::opts_chunk$set(
 
 # Install packages
 ```{r}
-#library(rdwd)
-#rdwd::updateRdwd() # --> installes the last version, developement version on the github is used..
-library(rdwd)
-
-#install.packages('dwdradar')
-library(dwdradar)
+# #library(rdwd)
+# #rdwd::updateRdwd() # --> installes the last version, developement version on the github is used..
+# library(rdwd)
+# 
+# #install.packages('dwdradar')
+# library(dwdradar)
 library(radolanr)
 
 library(ggplot2)
@@ -96,7 +96,7 @@ radp <- radolanr::dataDWDPerDay(mode = "latest")
 Project and then plot:
 - there seem to be a problem with the decimal places. One would understand 1/10mm, that a value of 1 means 0.1 mm but if I compare the rain amounts with measured values by weather stations, I would suggest, that a value of 1 is equal to 10mm of rain amount. 
 ```{r}
-plotRadar(radp, main=paste("mm in 24 hours preceding"), project=FALSE)
+#plotRadar(radp, main=paste("mm in 24 hours preceding"), project=FALSE)
 ```
 
 

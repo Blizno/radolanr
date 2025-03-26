@@ -40,7 +40,7 @@ https://rdrr.io/cran/remotes/man/install_github.html recomends:
 # "
 # To install from a private repo, use auth_token with a token
 # from https://github.com/settings/tokens. You only need the
-# repo scope. Best practice is to save your PAT in env var called
+# repo scope. Best practice is to save your PAT (Personal Access Token) in env var called
 # GITHUB_PAT.
 # "
 install_github("Blizno/radolanr", auth_token = "abcdefasdf")
@@ -51,4 +51,25 @@ install_github("Blizno/radolanr", auth_token = "abcdefasdf")
 ## load the package
 ```{r, eval = TRUE}
 library(radolanr)
+```
+
+
+## developing the package
+Dependencies are not automatically writen to DESCRIPTION and thus will not be loaded when the package is installed via install_github(). Run the following code to automatically write the used libraries (documented as Roxygen '# @import ...) to DESCRIPTION what will automatically install them as dependencies.
+```{r}
+library(attachment)
+library(desc)
+library(devtools)
+
+# Auto-detect dependencies and update DESCRIPTION
+attachment::att_amend_desc()
+
+# # Ensure dependencies install when package is installed
+# devtools::install_deps(dependencies = TRUE)
+
+message("✅ Dependencies updated and installed!")
+
+# run check, This ensures there are no missing dependencies.
+devtools::check()
+
 ```
