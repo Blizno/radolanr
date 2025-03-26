@@ -1,30 +1,13 @@
----
-title: use case 2 - get rain distribution along the Elbe River
-output:
-  github_document:
-    number_sections: true
----
+use case 2 - get rain distribution along the Elbe River
+================
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-```{r setup, echo = FALSE}
-# set general behaviour of the chunks here.. you may still modify it later in the chunks
-knitr::opts_chunk$set(
-  collapse = TRUE,
-  comment = "#>",
-  fig.path = "man/figures/README-",
-  echo = TRUE, 
-  results = "hide", # hide outputs of a the code (warnings ect. will still be printed; comand to unable in individual chunks: results="markup")
-  error=FALSE, # results = 'hide' option doesn't prevent other messages to be printed. To hide them like this, they will still be printed to console
-  warning=FALSE,  # results = 'hide' option doesn't prevent other messages to be printed. To hide them like this, they will still be printed to console
-  message=FALSE  # results = 'hide' option doesn't prevent other messages to be printed. To hide them like this, they will still be printed to console
-)
-```
+# 1 Introduction
 
-# Introduction
+# 2 Install packages
 
-# Install packages
-```{r}
+``` r
 #library(rdwd)
 #rdwd::updateRdwd() # --> installes the last version, developement version on the github is used..
 library(rdwd)
@@ -42,60 +25,68 @@ library(reshape2)
 library(terra) # for the raster and vector data treatment
 ```
 
-# load vector file to extract data
-```{r}
+# 3 load vector file to extract data
+
+``` r
 # read shapefiles of target areas
 #my.centroids <- terra::vect("data_raw/transsect_weinbau_seusslitz_pillnitz_4326.shp")
 ```
 
+## 3.1 DATENBESCHREIBUNG
 
-## DATENBESCHREIBUNG
---> refer to UseCase1
+–\> refer to UseCase1
 
-## Process data
-Access the radolan data latest dataset. Plotting will be undergone according to the rdwd package
-```{r}
+## 3.2 Process data
+
+Access the radolan data latest dataset. Plotting will be undergone
+according to the rdwd package
+
+``` r
 radp <- radolanr::dataDWDPerDay(mode = "latest", addMetaData = TRUE)
 ```
 
+![](man/figures/README-unnamed-chunk-3-1.png)<!-- -->
 
+# 4 extract values from raster file and save to given polygons
 
-# extract values from raster file and save to given polygons
-extract values at specific point with raster.. 
+extract values at specific point with raster..
 
-Todo: bisher stimmen diese Werte nicht mit denen überein die ich in der App ausgebe --> also mit denen die von https:---recent erstellt werden. Die Daten auf dem opendata.dwd scheinen 1h aktueller als die Daten auf dem cdc-ftpserver
+Todo: bisher stimmen diese Werte nicht mit denen überein die ich in der
+App ausgebe –\> also mit denen die von <https:---recent> erstellt
+werden. Die Daten auf dem opendata.dwd scheinen 1h aktueller als die
+Daten auf dem cdc-ftpserver
 
-```{r}
+``` r
 transsect_rain <- radolanr::radolan2polygon(
   locations_polygon_path = "data_raw/transsect_weinbau_seusslitz_pillnitz_polygons_4326.shp",
   radolan_raster = radp, # radolan raster file
   saveCentroidsVector = FALSE
 )
-
-
 ```
 
+# 5 Plots
 
-# Plots
+plot metadata stored along the raster (time of access and acutality of
+the radolan data). They are added by radolanr() if
+radolanr::dataDWDPerDay(mode = “latest”, addMetaData = TRUE)
 
-plot metadata stored along the raster (time of access and acutality of the radolan data). They are added by radolanr() if radolanr::dataDWDPerDay(mode = "latest", addMetaData = TRUE)
-```{r}
+``` r
 metags(radp)
 ```
 
 Plot Radolan data
-```{r}
+
+``` r
 plotRadar(radp, main=paste("mm in 24 hours preceding"), project=FALSE)
 ```
 
+![](man/figures/README-unnamed-chunk-6-1.png)<!-- -->
 
+# 6 Plot results using Leaflet
 
+## 6.1 Changing legend based on the background, show values when overing over map
 
-
-# Plot results using Leaflet
-
-## Changing legend based on the background, show values when overing over map
-```{r}
+``` r
 library(leaflet)
 library(sf)            # For spatial data
 library(terra)         # For raster handling
@@ -157,26 +148,15 @@ p1 <- leaflet() %>%
 
 # Show the map
 p1
-
 ```
 
+# 7 Export Data to be used e.g. in QGIS
 
-# Export Data to be used e.g. in QGIS
-```{r}
+``` r
 # terra::writeRaster(radp, "radolan4326.TIFF")
 # terra::writeVector(transsect_rain, "transsect_weinbau_seusslitz_pillnitz_polygons_rain24h_4326.shp", overwrite = TRUE)
 ```
 
-# Options: load shapefiles from a google-drive folder
-```{r}
+# 8 Options: load shapefiles from a google-drive folder
 
-
-
-```
-
-# Options: load shapefiles from QFieldCloud
-```{r}
-
-
-
-```
+# 9 Options: load shapefiles from QFieldCloud

@@ -89,7 +89,6 @@ Datasets are available at hour:50 every hour. So the dataset at 23:50 is the las
 # }
 
 radp <- radolanr::dataDWDPerDay(date = Sys.Date()-1, hour = "23")
-radp <- radolanr::dataDWDPerDay(date = Sys.Date(), hour = "18")
 radp <- radolanr::dataDWDPerDay(mode = "latest")
 ```
 
@@ -211,10 +210,9 @@ ggplot(data = coswig_day, aes(y = nied, x = Rain_coswig_radolan))+
 summary(lm(nied ~ Rain_coswig_radolan, data = coswig_day))
 ```
 
-
 ```{r}
-terra::writeRaster(radp,
-            "test.tif", overwrite=TRUE)
+
 
 ```
+
 

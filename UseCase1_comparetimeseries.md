@@ -103,16 +103,10 @@ radp <- radolanr::dataDWDPerDay(date = Sys.Date()-1, hour = "23")
 ![](man/figures/README-unnamed-chunk-3-1.png)<!-- -->
 
 ``` r
-radp <- radolanr::dataDWDPerDay(date = Sys.Date(), hour = "18")
-```
-
-![](man/figures/README-unnamed-chunk-3-2.png)<!-- -->
-
-``` r
 radp <- radolanr::dataDWDPerDay(mode = "latest")
 ```
 
-![](man/figures/README-unnamed-chunk-3-3.png)<!-- -->
+![](man/figures/README-unnamed-chunk-3-2.png)<!-- -->
 
 Project and then plot: - there seem to be a problem with the decimal
 places. One would understand 1/10mm, that a value of 1 means 0.1 mm but
@@ -260,9 +254,4 @@ ggplot(data = coswig_day, aes(y = nied, x = Rain_coswig_radolan))+
 
 ``` r
 summary(lm(nied ~ Rain_coswig_radolan, data = coswig_day))
-```
-
-``` r
-terra::writeRaster(radp,
-            "test.tif", overwrite=TRUE)
 ```
