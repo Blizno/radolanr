@@ -45,8 +45,6 @@ according to the rdwd package
 radp <- radolanr::dataDWDPerDay(mode = "latest", addMetaData = TRUE)
 ```
 
-![](man/figures/README-unnamed-chunk-3-1.png)<!-- -->
-
 # 4 extract values from raster file and save to given polygons
 
 extract values at specific point with raster..

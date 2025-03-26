@@ -98,15 +98,8 @@ the last dataset at a specific day
 # }
 
 radp <- radolanr::dataDWDPerDay(date = Sys.Date()-1, hour = "23")
-```
-
-![](man/figures/README-unnamed-chunk-3-1.png)<!-- -->
-
-``` r
 radp <- radolanr::dataDWDPerDay(mode = "latest")
 ```
-
-![](man/figures/README-unnamed-chunk-3-2.png)<!-- -->
 
 Project and then plot: - there seem to be a problem with the decimal
 places. One would understand 1/10mm, that a value of 1 means 0.1 mm but
@@ -144,11 +137,6 @@ my_list <- vector("list", length = length(days))
 for (i in seq_along(my_list)){
   my_list[[i]] <- dataDWDPerDay(date = as.Date(days[i]), hour = "23")
 }
-```
-
-![](man/figures/README-unnamed-chunk-6-1.png)<!-- -->![](man/figures/README-unnamed-chunk-6-2.png)<!-- -->![](man/figures/README-unnamed-chunk-6-3.png)<!-- -->![](man/figures/README-unnamed-chunk-6-4.png)<!-- -->![](man/figures/README-unnamed-chunk-6-5.png)<!-- -->![](man/figures/README-unnamed-chunk-6-6.png)<!-- -->![](man/figures/README-unnamed-chunk-6-7.png)<!-- -->![](man/figures/README-unnamed-chunk-6-8.png)<!-- -->![](man/figures/README-unnamed-chunk-6-9.png)<!-- -->![](man/figures/README-unnamed-chunk-6-10.png)<!-- -->![](man/figures/README-unnamed-chunk-6-11.png)<!-- -->![](man/figures/README-unnamed-chunk-6-12.png)<!-- -->![](man/figures/README-unnamed-chunk-6-13.png)<!-- -->![](man/figures/README-unnamed-chunk-6-14.png)<!-- -->
-
-``` r
 
 # create raster stack
 mystack <- terra::rast(my_list) # to create a raste stack use c(layer1, layer2,.. ) but if data is provided as a list use terra:rast(list)
@@ -181,17 +169,7 @@ library(rdwd)
 library(dwdradar)
 library(tidyverse)
 radolanr::dataDWDPerDay()
-```
-
-![](man/figures/README-unnamed-chunk-7-1.png)<!-- -->
-
-``` r
 radolan_stack <- radolanr::dataDWDPerDayInterval()
-```
-
-![](man/figures/README-unnamed-chunk-7-2.png)<!-- -->![](man/figures/README-unnamed-chunk-7-3.png)<!-- -->
-
-``` r
 my.centroids = terra::vect("data_raw/centroid_amms_weatherstation_coswig_4326.shp")
 my.timeseries <- radolanr::extractTimeSeriesFromStack(raster_stack = radolan_stack, centroids = my.centroids)
 my.timeseries$time_series
