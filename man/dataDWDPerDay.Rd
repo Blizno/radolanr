@@ -4,7 +4,12 @@
 \alias{dataDWDPerDay}
 \title{dataDWDPerDay}
 \usage{
-dataDWDPerDay(mode = "specific", date = Sys.Date() - 1, hour = "23")
+dataDWDPerDay(
+  mode = "specific",
+  date = Sys.Date() - 1,
+  hour = "23",
+  addMetaData = FALSE
+)
 }
 \arguments{
 \item{mode}{latest or specific if only the last dataset provided shall be used, variables date and hour will be ignored an the last dataset provided will be returned, the https server might also provide this but can not be accessed in the same way with rdwd}

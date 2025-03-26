@@ -38,6 +38,8 @@ library(ggplot2)
 library(tidyverse) 
 
 library(reshape2)
+
+library(terra) # for the raster and vector data treatment
 ```
 
 # load vector file to extract data
@@ -47,71 +49,176 @@ my.centroids <- terra::vect("data_raw/transsect_weinbau_seusslitz_pillnitz_4326.
 ```
 
 
-## Test: Daily Radar Files
-- refer to example in Berries Book: https://bookdown.org/brry/rdwd/use-case-daily-radar-files.html
-
-rdwd::updateRdwd() Download and read with readDWD.radar with dividebyten=TRUE:
-
-- rdwd greift auf ftp server zu --> umgucken dort mit winscp: opendata.dwd.de --> anonym zugreifen
-- ich greife mit meinem bisherigen skript auf https zu --> das ist aber in dataDWD auch implementiert, also kann ich auch weiterhin auf die "latest" daten zugreifen
-- so wie es scheint gibt es eine Abweichung um eine 10er Stelle. meine bisherigen Abfragen liefern höhere Werte um ziemlich genau *10 höher --> ich habe das Raster exportiert und die Werte verglichen am 8.1.2024 9:22 nach Niederschlägen über nacht die bei ca. 2mm lagen?? 0.2 mm scheint mir zu wenig. 
-- auf opendata.dwd.de gibt es eine Erklärung im pdf Format zu den Daten
-- 
-ftp://opendata.dwd.de/climate_environment/CDC/grids_germany/daily/ --> hier gibt es auch evapotranspiratioen!!
-
-
-
 ## DATENBESCHREIBUNG
-- Räumliche Abdeckung: Deutschland
-- Zeitliche Abdeckung: 2020-01-01 bis - heute
-- Räumliche Auflösung: 1km x 1km
-- Zeitliche Auflösung: 24 Stunden (rollend)
-- Projektion: Polar Steoreographische Projektion, Zentral Meridian 10.0° O , Standard Parallele 60.0° N
-- Format(e): Die Daten liegen als komprimierte Dateien im originären Binär-Format vor, Details siehe RADOLAN/RADVOR-Kompositformatbeschreibung.
-- Parameter: **Niederschlagshöhe in 1/10 mm**
-- Unsicherheiten: Eine erste Validierung der Daten zeigt, dass der mittlere absolute Fehler gegenüber den von Stationengemessenen Werten bei ca. 1,05 mm/Tag liegt. Details s. Beitrag zur Europäischen Radarkonferenz 2010 inSibiu.
+--> refer to UseCase1
 
-Kommentar: Ich verstehe die Angabe, dass die Niederschlagshöhen in 1/10mm angegeben sind so, dass die tatsächliche Niederschlagshöhe durch 10 geteilt wurde und für die richtigen Niederschlagsmengen, *10 gerechnet werden müssen! --> wenn sich das bestätigt wäre ein Hinweis für den Ersteller des Packages sehr hilfreich.. 
-
-Eine Andere Erklärung ist, dass die werte in "Zehntel-Milimetern" angegeben werden, dass also ein Wert von 1 einem Niederschag von 0.1mm entspricht. Und ein Wert von 10 einem Niederschlag von 1 mm. 
-
-Todo: vergleiche Niederschläge einer Wetterstation in der Nähe mit den Niederschlägen die von Radolan rausgegeben werden. Am Besten Niederschlagsdaten einer Station und Radolandaten an dieser Station vergleichen!
-
-Datasets are available at hour:50 every hour. So the dataset at 23:50 is the last dataset at a specific day
+## Process data
+Access the radolan data latest dataset. Plotting will be undergone according to the rdwd package
 ```{r}
-radp <- radolanr::dataDWDPerDay(mode = "latest")
+radp <- radolanr::dataDWDPerDay(mode = "latest", addMetaData = TRUE)
 ```
 
-
-Project and then plot:
-- there seem to be a problem with the decimal places. One would understand 1/10mm, that a value of 1 means 0.1 mm but if I compare the rain amounts with measured values by weather stations, I would suggest, that a value of 1 is equal to 10mm of rain amount. 
-```{r}
-plotRadar(radp, main=paste("mm in 24 hours preceding"), project=FALSE)
-```
 
 
 # extract values from raster file
 extract values at specific point with raster.. 
 
-!! bisher stimmen diese Werte nicht mit denen überein die ich in der App ausgebe --> also mit denen die von https:---recent erstellt werden. Die Daten auf dem opendata.dwd scheinen 1h aktueller als die Daten auf dem cdc-ftpserver
-```{r}
-# Extract raster values to list object
-r.vals <- terra::extract(radp, my.centroids, na.rm = TRUE)  # !! changed raster extract to terra:extract to be consistent here --> maybe change this in UseCase1 too
-r.vals  
+Todo: 
+- bisher stimmen diese Werte nicht mit denen überein die ich in der App ausgebe --> also mit denen die von https:---recent erstellt werden. Die Daten auf dem opendata.dwd scheinen 1h aktueller als die Daten auf dem cdc-ftpserver
 
-# Extract function returns a data frame with an ID column, so merge properly
-my.centroids$rain_24h <- r.vals[, 2]  # Second column contains raster values
-```
+# start with shape files, calculate centroids, extract calculate back
+# load vector file to extract data
+
+I will use terra alongside with geos package. Use terra if working with raster & vector data (most modern for raster). Use sf if doing vector operations (widely used, but heavier dependencies). Use geos for fast geometry computations (complements terra well).
 
 ```{r}
-# library(terra)
-# 
-# terra::plot(radp)  # Plot raster
-# #plot.new()
-# col_points <- terrain.colors(length(unique(my.centroids$rain_24h)))[as.factor(my.centroids$rain_24h)]
-# terra::plot(my.centroids, col=col_points, pch=16, cex=2, add=TRUE)  # Color by values
-# legend("topright", legend=unique(p$extracted_values), col=unique(col_points), pch=16)
+radolan2polygon <- function(locations_polygon_path, radolan_raster, use_metadata = TRUE, silent = TRUE, saveCentroidsVector = FALSE, centroidsVectorPath = ""){
+  # read shapefiles of target areas
+  shp <- terra::vect(locations_polygon_path)
+  my.centroids <- terra::centroids(shp)
+
+  # # Optional/Todo:
+  # # Convert SpatVector to geos_geometry and compute centroids that are guaranteed to be inside polygons (critical for irregular    polygons). This is not guaranteed for terra:centroides. However geos not natevly works with terra object so conversions are necessary.
+  # my.centroids.inside <- geos::geos_point_on_surface(shp)
+
+  if (saveCentroidsVector == TRUE){
+    terra::writeVector(my.centroids, "transsect_weinbau_seusslitz_pillnitz_polygons_centroids_4326.shp", overwrite = TRUE)
+  }
+
+  # Extract raster values to list object
+  r.vals <- terra::extract(radp, my.centroids, na.rm = FALSE)  # !! changed raster extract to terra:extract to be consistent here -->     maybe change this in UseCase1 too ; I think na should not be removed as this will change the ranking and number of extracted     values, but na.rm seems not to have an influence in the function, i.e. if polygons are outside the radolan map there will be NA in the resulting table, no matter if na.rm was TRUE or FALSE
+  if (silent == FALSE){
+    print(r.vals)
+  }
+
+
+  # Extract function returns a data frame with an ID column, so merge properly
+  my.centroids$rain_mm <- r.vals[, 2]  # Second column contains raster values
+
+  # Add metadata
+  my.metadata       <- terra::metags(radp) # a names character vector
+  timestamp_radolan <- my.metadata["timestamp_radolan"] # will give timestamp of radolan data in ISO8601 Format: "2025-03-26   08:50:00+0100" as character string (added by radolanr::dataDWDPerDay(mode = "latest", addMetaData = TRUE))
+
+
+  # create output
+  shp$rain_mm <- r.vals[,2]
+  shp$timestamp_radolan <- timestamp_radolan
+  
+  return(shp)
+  
+}
+
+
+transsect_rain <- radolan2polygon(
+  locations_polygon_path = "data_raw/transsect_weinbau_seusslitz_pillnitz_polygons_4326.shp",
+  radolan_raster = radp, # radolan raster file
+  saveCentroidsVector = FALSE
+)
 
 ```
 
+
+# Plots
+
+plot metadata stored along the raster (time of access and acutality of the radolan data). They are added by radolanr() if radolanr::dataDWDPerDay(mode = "latest", addMetaData = TRUE)
+```{r}
+metags(radp)
+```
+
+Plot Radolan data
+```{r}
+plotRadar(radp, main=paste("mm in 24 hours preceding"), project=FALSE)
+```
+
+
+
+
+
+# Plot results
+
+# Plot results using Leaflet
+
+## Changing legend based on the background, show values when overing over map
+```{r}
+library(leaflet)
+library(sf)            # For spatial data
+library(terra)         # For raster handling
+library(RColorBrewer)  # For color palettes
+
+# Load the polygon shapefile
+# (Replace this with your actual spatial data)
+# transsect_rain <- st_read("path_to_shapefile.shp")
+
+# Load the raster layer
+# (Replace this with your actual raster data)
+# radp <- rast("path_to_raster.tif")
+
+# Define a color palette for rain amounts (based on polygons by default)
+pal_rain <- colorNumeric(palette = "YlGnBu", domain = transsect_rain$rain_mm)
+
+# Define a color palette for radp (raster) values
+pal_radp <- colorNumeric(palette = "YlGnBu", domain = values(radp), na.color = "transparent")
+
+# Create the Leaflet map
+p1 <- leaflet() %>%
+  # Base Layers: OpenStreetMap and RADP Raster
+  addTiles(group = "OpenStreetMap") %>%  # Default basemap
+
+  addRasterImage(radp, colors = pal_radp, opacity = 0.7, group = "RADP Raster") %>%  # Raster layer
+  
+  
+  # Polygon Layer with Popups on Hover
+  addPolygons(
+    stroke = TRUE,               # Borderlines
+    color = "black",             # Borderline color
+    opacity = 1,                 # Borderline transparency
+    data = transsect_rain,       # Polygon layer
+    weight = 1,                  # Line thickness
+    smoothFactor = 0.3,          # Smooth the polygon borders
+    fillOpacity = 0.8,           
+    fillColor = ~pal_rain(rain_mm),  # Color based on rain_mm
+    label = ~paste0("Rain: ", rain_mm, " mm"),  # Show value on hover
+    highlight = highlightOptions(weight = 2, color = "red", fillOpacity = 0.9) # Highlight effect on hover
+  ) %>%
+
+
+  # Add Layer Control to Toggle between OpenStreetMap and RADP Raster
+  addLayersControl(
+    baseGroups = c("OpenStreetMap", "RADP Raster"),  # User can switch backgrounds
+    overlayGroups = c("Polygons"),  # Polygons always visible
+    options = layersControlOptions(collapsed = FALSE)
+  ) %>%
+
+  # Add Dynamic Legend (changes based on background)
+  addLegend(
+    pal = pal_rain, values = transsect_rain$rain_mm, opacity = 0.8,
+    labFormat = labelFormat(big.mark = "'"),
+    title = "Regen<br>Summe 24h<br>(mm)<br>RADOLAN",
+    group = "OpenStreetMap"  # Legend applies when OpenStreetMap is active
+  ) %>%
+  addLegend(
+    pal = pal_radp, values = values(radp), opacity = 0.8,
+    labFormat = labelFormat(big.mark = "'"),
+    title = "Regen<br>Summe 24h<br>(mm)<br>RADOLAN (Raster)",
+    group = "RADP Raster"  # Legend applies when RADP Raster is active
+  )
+
+# Show the map
+p1
+
+```
+
+
+# Export Data to be used e.g. in QGIS
+```{r}
+# terra::writeRaster(radp, "radolan4326.TIFF")
+# terra::writeVector(transsect_rain, "transsect_weinbau_seusslitz_pillnitz_polygons_rain24h_4326.shp", overwrite = TRUE)
+```
+
+# Options: load shapefiles from a google-drive folder
+```{r}
+
+
+
+```
 

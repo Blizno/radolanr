@@ -39,7 +39,7 @@ dataDWDPerDay.old <- function(date = Sys.Date()-1, hour = "23"){
 #' @examples radolanr::dataDWDPerDay(date = Sys.Date()-1, hour = "23")
 #' @import rdwd dwdradar
 #' @export
-dataDWDPerDay <- function(mode = "specific", date = Sys.Date()-1, hour = "23"){
+dataDWDPerDay <- function(mode = "specific", date = Sys.Date()-1, hour = "23", addMetaData = FALSE){
   # library(rdwd)
   #rdwd::updateRdwd() # --> installes the last version, developement version on the github is used..
   #library(rdwd)
@@ -95,6 +95,26 @@ dataDWDPerDay <- function(mode = "specific", date = Sys.Date()-1, hour = "23"){
   # plot it for testing
   plotRadar(radp, main=paste("mm in 24 hours preceding", rad$meta$date), project=FALSE)
 
+  str(rad$meta$date)
+
+  if (addMetaData == TRUE){ # it is not clear if this will also work for a rasterstack
+    # Add metadata using metags() # https://rspatial.github.io/terra/reference/metags.html
+
+    # standardize date format information by adding the ISO 8601 Format with offset to UTC asigned, can be done by %z Signed offset in hours and minutes from UTC, so -0800 is 8 hours behind UTC. Values up to +1400 are accepted. (Standard only for output. For input R currently supports it on all platforms.)
+
+    #datetime_posixct <- as.POSIXct(timestamp_radolan, format = "%Y-%m-%d %H:%M:%S") # not completely clear if this is UTC, summer or winter time
+
+    timestamp_radolan_posixct_ISO <- format(rad$meta$date, "%Y-%m-%d %H:%M:%S%z")
+    print(timestamp_radolan_posixct_ISO)
+
+    timestamp_access_posixct_ISO <- format(Sys.time(), "%Y-%m-%d %H:%M:%S%z")
+    print(timestamp_access_posixct_ISO)
+
+
+    my.tag <- cbind(c("timestamp_radolan", "timestamp_access"), c(as.character(timestamp_radolan_posixct_ISO), as.character(timestamp_access_posixct_ISO)))
+    metags(radp, layer = NULL, domain = "") <- my.tag
+    metags(radp)
+  }
   return(radp)
 }
 
