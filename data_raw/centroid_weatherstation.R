@@ -1,12 +1,11 @@
-## code to prepare `wh` dataset goes here
+## code to prepare `centroids_weatherstation` dataset goes here
 
 library(tidyverse)
 library(usethis)
-#library(terra)
 library(sf)
 
 
-centroid_weatherstation <- sf::st_read(("data_raw/centroid_amms_weatherstation_coswig_4326.shp")
+centroid_weatherstation <- sf::st_read("data_raw/centroid_amms_weatherstation_coswig_4326.shp")
 
 # 2. add your data to the "/data" file of the package and make it available
 usethis::use_data(centroid_weatherstation, overwrite = TRUE)
