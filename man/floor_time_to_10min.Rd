@@ -7,9 +7,7 @@
 floor_time_to_10min(mytime)
 }
 \arguments{
-\item{raster_stack}{given radolan raster stack, exportet from dataDWDPerDayInterval()}
-
-\item{centroids}{in the format of SpatialPoints for which data shall be exported}
+\item{mytime}{description}
 }
 \value{
 a list of the resulting timeseries as data.frame along with given centroids and raster stack

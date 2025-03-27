@@ -17,6 +17,8 @@ dataDWDPerDay(
 \item{date}{as Date formate YY-MM-DD}
 
 \item{hour}{hour of the day}
+
+\item{addMetaData}{description}
 }
 \value{
 a radolan grid

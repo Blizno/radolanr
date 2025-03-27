@@ -5,20 +5,20 @@
 \title{dataDWDPerDayInterval}
 \usage{
 dataDWDPerDayInterval(
-  date.start = as.Date("2025-01-01"),
-  date.end = as.Date("2025-01-02"),
+  date_start = as.Date("2025-01-01"),
+  date_end = as.Date("2025-01-02"),
   hour = "23",
   ...
 )
 }
 \arguments{
-\item{date.end}{as.Date format e.g. as.Date("2025-01-01")}
+\item{date_start}{as.Date format}
 
-\item{hour}{hour of the day}
+\item{date_end}{as.Date format e.g. as.Date("2025-01-01")}
 
-\item{date}{as Date formate YY-MM-DD}
+\item{hour}{description}
 
-\item{data.start}{as.Date format}
+\item{...}{some other arguments}
 }
 \value{
 a radolan grid

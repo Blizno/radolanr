@@ -21,7 +21,7 @@ Imports:
     tidyverse,
     R.utils
 Encoding: UTF-8
-LazyData: true
+LazyData: false
 RoxygenNote: 7.3.2
 Depends: 
     R (>= 3.5)

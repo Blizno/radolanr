@@ -9,6 +9,7 @@
 #' @param date as Date formate YY-MM-DD
 #' @param hour hour of the day
 #' @param mode latest or specific if only the last dataset provided shall be used, variables date and hour will be ignored an the last dataset provided will be returned, the https server might also provide this but can not be accessed in the same way with rdwd
+#' @param addMetaData description
 #' @return a radolan grid
 #' @examples radolanr::dataDWDPerDay(date = Sys.Date()-1, hour = "23")
 #' @import rdwd dwdradar R.utils
@@ -93,16 +94,16 @@ dataDWDPerDay <- function(mode = "specific", date = Sys.Date()-1, hour = "23", a
 #' @description
 #' Download data of Radolan Data for a specific time interval
 #' all arguments from dataDWDPerDay() may be used to e.g. specify the reference hour for the measurement, default is 23:00, but data is from the last 24h, so 23:00 largly represents the precipitation of the given day.
-#' @param date as Date formate YY-MM-DD
-#' @param hour hour of the day
-#' @param data.start as.Date format
-#' @param date.end as.Date format e.g. as.Date("2025-01-01")
+#' @param date_start as.Date format
+#' @param date_end as.Date format e.g. as.Date("2025-01-01")
+#' @param hour description
+#' @param ...  some other arguments
 #' @return a radolan grid
 #' @examples radolanr::dataDWDPerDay(date = Sys.Date()-1, hour = "23")
 #' @import rdwd dwdradar
 #' @export
-dataDWDPerDayInterval <- function(date.start = as.Date("2025-01-01"), date.end = as.Date("2025-01-02"), hour = "23",...){
-  days <- as.Date(date.start:date.end)
+dataDWDPerDayInterval <- function(date_start = as.Date("2025-01-01"), date_end = as.Date("2025-01-02"), hour = "23", ...){
+  days <- as.Date(date_start:date_end)
   my_list <- vector("list", length = length(days))
 
   # sequentially download radolan data for the last days
@@ -177,9 +178,7 @@ extractTimeSeriesFromStack <- function(raster_stack, centroids){
 #'
 #' @description
 #' round_time_to_10min
-#'
-#' @param raster_stack given radolan raster stack, exportet from dataDWDPerDayInterval()
-#' @param centroids in the format of SpatialPoints for which data shall be exported
+#' @param mytime description
 #' @return a list of the resulting timeseries as data.frame along with given centroids and raster stack
 #' @export
 #'
