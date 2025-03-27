@@ -16,10 +16,8 @@ Imports:
     dplyr,
     dwdradar,
     terra,
-    raster,
     rdwd,
-    tidyverse,
-    R.utils
+    tidyverse
 Encoding: UTF-8
 LazyData: false
 RoxygenNote: 7.3.2
