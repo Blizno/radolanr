@@ -5,7 +5,7 @@
 #' Outlook: I will in future maybe use terra alongside with geos package. Use terra if working with raster & vector data (most modern for raster). Use sf if doing vector operations (widely used, but heavier dependencies). Use geos for fast geometry computations (complements terra well).
 #'
 
-#' @param locations_polygon_path a polygon layer (.shp)
+#' @param locations_polygon_path a polygon layer (.shp) may be the file or its path
 #' @param radolan_raster the radolan raster created with radolanr::dataDWDPerDay(mode = "latest", addMetaData = TRUE)
 #' @param use_metadata use metadata stored in a terra::metag() in the radolan_raster only set to TRUE if dataDWDPerDay(mode = "latest", addMetaData = TRUE) was used in prior processing
 #' @param silent show warnings, plots,..
@@ -17,6 +17,23 @@
 #' @export
 radolan2polygon <- function(locations_polygon_path, radolan_raster, use_metadata = TRUE, silent = TRUE, saveCentroidsVector = FALSE, centroidsVectorPath = ""){
   # read shapefiles of target areas
+
+  try({
+    # Check if input is already a SpatVector
+    if (inherits(locations_polygon_path, "SpatVector")) {
+      shp <- locations_polygon_path  # Directly assign if it is a SpatVector
+
+      # Check if input is a valid file path
+    } else if (is.character(locations_polygon_path) &&
+               file.exists(locations_polygon_path)) {
+      shp <- terra::vect(locations_polygon_path)  # Read shapefile if it exists
+
+      # If neither, return an error
+    } else {
+      stop("Error: Input must be either a valid SpatVector or a path to a shapefile.")
+    }
+  }, silent = FALSE)  # Ensure errors are displayed
+
   shp <- terra::vect(locations_polygon_path)
   my.centroids <- terra::centroids(shp)
 
@@ -29,7 +46,7 @@ radolan2polygon <- function(locations_polygon_path, radolan_raster, use_metadata
   }
 
   # Extract raster values to list object
-  r.vals <- terra::extract(radp, my.centroids, na.rm = FALSE)  # !! changed raster extract to terra:extract to be consistent here -->     maybe change this in UseCase1 too ; I think na should not be removed as this will change the ranking and number of extracted     values, but na.rm seems not to have an influence in the function, i.e. if polygons are outside the radolan map there will be NA in the resulting table, no matter if na.rm was TRUE or FALSE
+  r.vals <- terra::extract(radolan_raster, my.centroids, na.rm = FALSE)  # !! changed raster extract to terra:extract to be consistent here -->     maybe change this in UseCase1 too ; I think na should not be removed as this will change the ranking and number of extracted     values, but na.rm seems not to have an influence in the function, i.e. if polygons are outside the radolan map there will be NA in the resulting table, no matter if na.rm was TRUE or FALSE
 
   if (silent == FALSE){
     print(r.vals)
@@ -40,7 +57,7 @@ radolan2polygon <- function(locations_polygon_path, radolan_raster, use_metadata
 
   # Add metadata
   if (use_metadata == TRUE){
-    my.metadata       <- terra::metags(radp) # a names character vector
+    my.metadata       <- terra::metags(radolan_raster) # a names character vector
     timestamp_radolan <- my.metadata["timestamp_radolan"] # will give timestamp of radolan data in ISO8601 Format: "2025-03-26   08:50:00+0100" as character string (added by radolanr::dataDWDPerDay(mode = "latest", addMetaData = TRUE))
   }
 

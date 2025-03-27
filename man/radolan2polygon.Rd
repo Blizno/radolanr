@@ -14,7 +14,7 @@ radolan2polygon(
 )
 }
 \arguments{
-\item{locations_polygon_path}{a polygon layer (.shp)}
+\item{locations_polygon_path}{a polygon layer (.shp) may be the file or its path}
 
 \item{radolan_raster}{the radolan raster created with radolanr::dataDWDPerDay(mode = "latest", addMetaData = TRUE)}
 
