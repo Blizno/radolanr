@@ -15,9 +15,9 @@ License: GPL-3 + file LICENSE
 Imports: 
     dplyr,
     dwdradar,
+    terra,
     raster,
     rdwd,
-    terra,
     tidyverse,
     R.utils
 Encoding: UTF-8
