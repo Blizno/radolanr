@@ -14,11 +14,11 @@ radolan2polygon(
 )
 }
 \arguments{
-\item{locations_polygon_path}{a polygon layer (.shp) may be the file or its path}
+\item{locations_polygon_path}{a polygon layer (may be the file or its path)}
 
-\item{radolan_raster}{the radolan raster created with radolanr::dataDWDPerDay(mode = "latest", addMetaData = TRUE)}
+\item{radolan_raster}{the radolan raster created with radolanr::dataDWDPerDay(addMetaData = TRUE)}
 
-\item{use_metadata}{use metadata stored in a terra::metag() in the radolan_raster only set to TRUE if dataDWDPerDay(mode = "latest", addMetaData = TRUE) was used in prior processing}
+\item{use_metadata}{use metadata stored in a terra::metag()}
 
 \item{silent}{show warnings, plots,..}
 
@@ -32,7 +32,4 @@ a polygon layer with locations_polygon_path filled with rain_mm values from rado
 \description{
 This function
 Outlook: I will in future maybe use terra alongside with geos package. Use terra if working with raster & vector data (most modern for raster). Use sf if doing vector operations (widely used, but heavier dependencies). Use geos for fast geometry computations (complements terra well).
-}
-\examples{
-radolan2polygon(locations_polygon_path = "data_raw/transsect_weinbau_seusslitz_pillnitz_polygons_4326.shp", radolan_raster = radp)
 }

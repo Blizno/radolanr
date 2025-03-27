@@ -11,7 +11,7 @@
 #' @param mode latest or specific if only the last dataset provided shall be used, variables date and hour will be ignored an the last dataset provided will be returned, the https server might also provide this but can not be accessed in the same way with rdwd
 #' @return a radolan grid
 #' @examples radolanr::dataDWDPerDay(date = Sys.Date()-1, hour = "23")
-#' @import rdwd dwdradar
+#' @import rdwd dwdradar R.utils
 #' @export
 dataDWDPerDay <- function(mode = "specific", date = Sys.Date()-1, hour = "23", addMetaData = FALSE){
   # library(rdwd)
@@ -134,8 +134,6 @@ dataDWDPerDayInterval <- function(date.start = as.Date("2025-01-01"), date.end =
 #' @param raster_stack given radolan raster stack, exportet from dataDWDPerDayInterval()
 #' @param centroids in the format of SpatialPoints for which data shall be exported
 #' @return a list of the resulting timeseries as data.frame along with given centroids and raster stack
-#' @examples my.centroids = terra::vect("data_raw/centroid_amms_weatherstation_coswig_4326.shp")
-#' @examples my.timeseries <- extractTimeSeriesFromStack(raster_stack = radolan_stack, centroids = my.centroids)
 #' @import raster tidyverse
 #' @export
 extractTimeSeriesFromStack <- function(raster_stack, centroids){
@@ -183,8 +181,6 @@ extractTimeSeriesFromStack <- function(raster_stack, centroids){
 #' @param raster_stack given radolan raster stack, exportet from dataDWDPerDayInterval()
 #' @param centroids in the format of SpatialPoints for which data shall be exported
 #' @return a list of the resulting timeseries as data.frame along with given centroids and raster stack
-#' @examples my.centroids = terra::vect("data_raw/centroid_amms_weatherstation_coswig_4326.shp")
-#' @examples my.timeseries <- extractTimeSeriesFromStack(raster_stack = radolan_stack, centroids = my.centroids)
 #' @export
 #'
 #'

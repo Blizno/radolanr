@@ -1,20 +1,17 @@
 Type: Package
 Package: radolanr
-Title: This package offers functions to read radolan data and to create
-    information of spatial and temporal variability of rain for sites
-    given as points or polygons given as shape files
+Title: Quantify temporal and spatial variability of rain from RADOLAN Data
 Version: 0.1.0
 Authors@R: 
-    person("Rikard", "Graß", , "rikardg@web.de", role = c("aut", "cre"))
+    person("Rikard", "Grass", , "rikardg@web.de", role = c("aut", "cre"))
 Description: This package offers functions to read radolan data and to
-    create information of spatial and temporal variability of rain for
-    sites given as points or polygons given as shape files.  Find two
-    usecases in the github reposiory 1) creating timeseries of radolan
-    data and compare it with data measured by weather stations 2) estimate
+    create information of spatial and temporal variability of rain. Processes are offered for
+    sites given as points or polygons given as shape files. Find two
+    usecases in the github reposiory. First creating timeseries of radolan
+    data and compare it with data measured by weather stations. Second usecase estimates
     spatial distribution of rainfall at points of interest given in a
-    polygonlayer find more information here:
-    https://github.com/Blizno/radolanr/
-License: GNU General Public License v3.0
+    polygonlayer. Find more information here in the github repository.
+License: GPL-3 + file LICENSE
 Imports: 
     dplyr,
     dwdradar,

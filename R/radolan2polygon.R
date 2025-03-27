@@ -5,14 +5,13 @@
 #' Outlook: I will in future maybe use terra alongside with geos package. Use terra if working with raster & vector data (most modern for raster). Use sf if doing vector operations (widely used, but heavier dependencies). Use geos for fast geometry computations (complements terra well).
 #'
 
-#' @param locations_polygon_path a polygon layer (.shp) may be the file or its path
-#' @param radolan_raster the radolan raster created with radolanr::dataDWDPerDay(mode = "latest", addMetaData = TRUE)
-#' @param use_metadata use metadata stored in a terra::metag() in the radolan_raster only set to TRUE if dataDWDPerDay(mode = "latest", addMetaData = TRUE) was used in prior processing
+#' @param locations_polygon_path a polygon layer (may be the file or its path)
+#' @param radolan_raster the radolan raster created with radolanr::dataDWDPerDay(addMetaData = TRUE)
+#' @param use_metadata use metadata stored in a terra::metag()
 #' @param silent show warnings, plots,..
 #' @param saveCentroidsVector export the created centroids to a shapefile (boolean)
 #' @param centroidsVectorPath path where the centroids will be exported to (.shp)
 #' @return a polygon layer with locations_polygon_path filled with rain_mm values from radolan data
-#' @examples radolan2polygon(locations_polygon_path = "data_raw/transsect_weinbau_seusslitz_pillnitz_polygons_4326.shp", radolan_raster = radp)
 #' @import terra
 #' @export
 radolan2polygon <- function(locations_polygon_path, radolan_raster, use_metadata = TRUE, silent = TRUE, saveCentroidsVector = FALSE, centroidsVectorPath = ""){

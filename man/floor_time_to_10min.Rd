@@ -17,7 +17,3 @@ a list of the resulting timeseries as data.frame along with given centroids and 
 \description{
 round_time_to_10min
 }
-\examples{
-my.centroids = terra::vect("data_raw/centroid_amms_weatherstation_coswig_4326.shp")
-my.timeseries <- extractTimeSeriesFromStack(raster_stack = radolan_stack, centroids = my.centroids)
-}
