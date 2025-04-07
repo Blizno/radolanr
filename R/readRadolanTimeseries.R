@@ -45,9 +45,9 @@ dataDWDPerDay <- function(mode = "specific", date = Sys.Date()-1, hour = "23", a
 
     # test if minutes are > or < 20 Mintes (add some buffer and use 25)
     if (time_lt$min >=0 & time_lt$min < 25){
-      time_lt$hour <- time_lt$hour - 3
+      time_lt$hour <- time_lt$hour - 4  # 3 --> in wintertime --> this is a bug
     } else {
-      time_lt$hour <- time_lt$hour - 2
+      time_lt$hour <- time_lt$hour - 3  # 2 --> in wintertime --> this is a bug
     }
 
     time_lt$min <- 50
