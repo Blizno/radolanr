@@ -10,33 +10,23 @@ use case 2 - get rain distribution along the Elbe River
 ``` r
 #library(rdwd)
 #rdwd::updateRdwd() # --> installes the last version, developement version on the github is used..
-library(rdwd)
 
-#install.packages('dwdradar')
-library(dwdradar)
+# library(rdwd)
+# #install.packages('dwdradar')
+# library(dwdradar)
 library(radolanr)
 
 library(ggplot2)
-
 library(tidyverse) 
-
 library(reshape2)
-
 library(terra) # for the raster and vector data treatment
 ```
 
-# 3 load vector file to extract data
-
-``` r
-# read shapefiles of target areas
-#my.centroids <- terra::vect("data_raw/transsect_weinbau_seusslitz_pillnitz_4326.shp")
-```
-
-## 3.1 DATENBESCHREIBUNG
+## 2.1 DATENBESCHREIBUNG
 
 –\> refer to UseCase1
 
-## 3.2 Process data
+## 2.2 Process data
 
 Access the radolan data latest dataset. Plotting will be undergone
 according to the rdwd package
@@ -45,7 +35,7 @@ according to the rdwd package
 radp <- radolanr::dataDWDPerDay(mode = "latest", addMetaData = TRUE)
 ```
 
-# 4 extract values from raster file and save to given polygons
+# 3 extract values from raster file and save to given polygons
 
 extract values at specific point with raster..
 
@@ -55,14 +45,19 @@ werden. Die Daten auf dem opendata.dwd scheinen 1h aktueller als die
 Daten auf dem cdc-ftpserver
 
 ``` r
+data("transsects_weinbau")
+
 transsect_rain <- radolanr::radolan2polygon(
-  locations_polygon_path = "data_raw/transsect_weinbau_seusslitz_pillnitz_polygons_4326.shp",
+  #locations_polygon_path = "data_raw/transsect_weinbau_seusslitz_pillnitz_polygons_4326.shp", # may be file or RData object
+  locations_polygon_path = transsects_weinbau,
   radolan_raster = radp, # radolan raster file
   saveCentroidsVector = FALSE
 )
+
+# this throughs an error but I do not know why..
 ```
 
-# 5 Plots
+# 4 Plots
 
 plot metadata stored along the raster (time of access and acutality of
 the radolan data). They are added by radolanr() if
@@ -75,14 +70,12 @@ metags(radp)
 Plot Radolan data
 
 ``` r
-plotRadar(radp, main=paste("mm in 24 hours preceding"), project=FALSE)
+#plotRadar(radp, main=paste("mm in 24 hours preceding"), project=FALSE)
 ```
 
-![](man/figures/README-unnamed-chunk-6-1.png)<!-- -->
+# 5 Plot results using Leaflet
 
-# 6 Plot results using Leaflet
-
-## 6.1 Changing legend based on the background, show values when overing over map
+## 5.1 Changing legend based on the background, show values when overing over map
 
 ``` r
 library(leaflet)
@@ -148,13 +141,13 @@ p1 <- leaflet() %>%
 p1
 ```
 
-# 7 Export Data to be used e.g. in QGIS
+# 6 Export Data to be used e.g. in QGIS
 
 ``` r
 # terra::writeRaster(radp, "radolan4326.TIFF")
 # terra::writeVector(transsect_rain, "transsect_weinbau_seusslitz_pillnitz_polygons_rain24h_4326.shp", overwrite = TRUE)
 ```
 
-# 8 Options: load shapefiles from a google-drive folder
+# 7 Options: load shapefiles from a google-drive folder
 
-# 9 Options: load shapefiles from QFieldCloud
+# 8 Options: load shapefiles from QFieldCloud

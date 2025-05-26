@@ -49,20 +49,22 @@ radp <- radolanr::dataDWDPerDay(mode = "latest", addMetaData = TRUE)
 ```
 
 
-
 # extract values from raster file and save to given polygons
 extract values at specific point with raster.. 
 
 Todo: bisher stimmen diese Werte nicht mit denen überein die ich in der App ausgebe --> also mit denen die von https:---recent erstellt werden. Die Daten auf dem opendata.dwd scheinen 1h aktueller als die Daten auf dem cdc-ftpserver
 
 ```{r}
+data("transsects_weinbau")
+
 transsect_rain <- radolanr::radolan2polygon(
-  locations_polygon_path = "data_raw/transsect_weinbau_seusslitz_pillnitz_polygons_4326.shp",
+  #locations_polygon_path = "data_raw/transsect_weinbau_seusslitz_pillnitz_polygons_4326.shp", # may be file or RData object
+  locations_polygon_path = transsects_weinbau,
   radolan_raster = radp, # radolan raster file
   saveCentroidsVector = FALSE
 )
 
-
+# this throughs an error but I do not know why..
 ```
 
 

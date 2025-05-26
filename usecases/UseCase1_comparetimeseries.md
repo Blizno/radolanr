@@ -8,12 +8,12 @@ use case 1 - compare timeseries of Radolan and AMMS Station in Coswig
 # 2 Install packages
 
 ``` r
-#library(rdwd)
-#rdwd::updateRdwd() # --> installes the last version, developement version on the github is used..
-library(rdwd)
-
-#install.packages('dwdradar')
-library(dwdradar)
+# #library(rdwd)
+# #rdwd::updateRdwd() # --> installes the last version, developement version on the github is used..
+# library(rdwd)
+# 
+# #install.packages('dwdradar')
+# library(dwdradar)
 library(radolanr)
 
 library(ggplot2)
@@ -26,8 +26,10 @@ library(reshape2)
 # 3 load vector file to extract data
 
 ``` r
+data(centroid_weatherstation)
 # read shapefiles of target areas
-my.centroids <- terra::vect("data_raw/centroid_amms_weatherstation_coswig_4326.shp")
+#my.centroids <- terra::vect("data_raw/centroid_amms_weatherstation_coswig_4326.shp") # you may load it as a shapefile 
+my.centroids <- centroid_weatherstation # or as an vector object
 ```
 
 ## 3.1 Test: Daily Radar Files
@@ -107,10 +109,8 @@ if I compare the rain amounts with measured values by weather stations,
 I would suggest, that a value of 1 is equal to 10mm of rain amount.
 
 ``` r
-plotRadar(radp, main=paste("mm in 24 hours preceding"), project=FALSE)
+#plotRadar(radp, main=paste("mm in 24 hours preceding"), project=FALSE)
 ```
-
-![](man/figures/README-unnamed-chunk-4-1.png)<!-- -->
 
 # 4 extract values from raster file
 
@@ -146,7 +146,6 @@ names(mystack) <- days
 
 # extract the rain amounts at specific points
 r.vals <- raster::extract(mystack, my.centroids, na.rm = TRUE)  #
-r.vals
 
 rain_radolan <- as.data.frame(t(r.vals), ) # transpose the results
 rain_radolan$date <- rownames(rain_radolan)
@@ -159,6 +158,8 @@ colnames(rain_radolan) <- c("Rain_coswig_radolan","date" )
 rain_radolan <- rain_radolan %>%
   mutate(date = as.Date(date)) %>%
   dplyr::select(date,Rain_coswig_radolan)
+
+rain_radolan
 ```
 
 # 6 use the package
@@ -170,7 +171,8 @@ library(dwdradar)
 library(tidyverse)
 radolanr::dataDWDPerDay()
 radolan_stack <- radolanr::dataDWDPerDayInterval()
-my.centroids = terra::vect("data_raw/centroid_amms_weatherstation_coswig_4326.shp")
+#my.centroids = terra::vect("data_raw/centroid_amms_weatherstation_coswig_4326.shp")
+my.centroids <- centroid_weatherstation # or as an vector object --> here from radolanr::data(centroid_weatherstation)
 my.timeseries <- radolanr::extractTimeSeriesFromStack(raster_stack = radolan_stack, centroids = my.centroids)
 my.timeseries$time_series
 
@@ -191,7 +193,8 @@ library(lubridate) # lubridate for date transformations
 my.startdate = "2024-01-01T00:00:00Z"
 my.interval = as.numeric(Sys.Date() - as.Date(my.startdate)) * 24
 
-coswig <- opensensorwebr::etmodeldata("https://api.opensensorweb.de/v0/networks/AMMS_WETTERDATEN",
+#coswig <- opensensorwebr::etmodeldata("https://api.opensensorweb.de/v0/networks/AMMS_WETTERDATEN",
+coswig <- opensensorwebr::etmodeldata("https://api.sensoto.io/v1/organizations/open/networks/AMMS_WETTERDATEN", # opensensorweb changed to sensoto
                                       my.device = "S021",
                                       my.startdate = my.startdate,
                                       my.interval = my.interval,
@@ -203,6 +206,10 @@ coswig <- opensensorwebr::etmodeldata("https://api.opensensorweb.de/v0/networks/
                                       file = "temp/Wetter_Coswig_",
                                       write.RData = FALSE,
                                       write.csv = FALSE)
+
+#"https://api.sensoto.io/v1/organizations/open/networks/AMMS_WETTERDATEN/devices/S021/sensors/Globalstrahlg_200cm/measurements"
+
+
 coswig_day <- coswig %>%
   mutate(date   = lubridate::date(date)) %>%
   group_by(date) %>%
